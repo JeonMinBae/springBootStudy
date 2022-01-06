@@ -1,0 +1,51 @@
+plugins {
+	id 'org.springframework.boot' version '2.6.1'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+}
+
+group = 'com.hardy'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+apply plugin: 'idea'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	//Security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	//lombok
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.12'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	developmentOnly 'org.springframew¬ork.boot:spring-boot-devtools'
+	//JPA
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.6.1'
+	implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '7.0.1.Final'
+	//Mysql
+	implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.27'
+
+	//JWT
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2',
+			'io.jsonwebtoken:jjwt-jackson:0.11.2'
+	//OAuth
+	implementation group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.3.5.RELEASE'
+}
+
+test {
+	useJUnitPlatform()
+}

@@ -1,0 +1,39 @@
+server:
+    port: 10000
+    servlet:
+        context-path: /
+        encoding:
+            charset: UTF-8
+            enabled: true
+            force: true
+
+spring:
+#    devtools:
+#        restart:
+#            enabled: true
+    datasource:
+        #mysql driver없으니까 Error creating bean with name 'dataSource' defined in class path resource 뜸
+        url: jdbc:mysql://127.0.0.1:3306/spring_boot_study
+        username: root
+        password: root
+    jpa:
+        hibernate:
+            #create SessionFactory가 '시작'될 때 기존테이블을 삭제 후 다시 생성
+            #create-drop SessionFactory가 '종료'될 때 기존테이블을 삭제 후 다시 생성
+            #update 변경된 스키마만 반영
+            #none 아무것도 하지 않음
+            ddl-auto: update
+            naming:
+                #변수 명 그대로 DB필드에 반영 - org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+                #변수 명을 snake 표기법으로 반영 - org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+                physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+            #true 기본 넘버링 전략을 따라간다는 뜻
+            #false jpa가 사용하는 기본 넘버링 전략을 따라가지 않음
+            use-new-id-generator-mappings: false
+
+        #콘솔 화면에 쿼리문 출력
+        show-sql: true
+        open-in-view: false
+
+
+
