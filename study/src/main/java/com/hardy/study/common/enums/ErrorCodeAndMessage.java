@@ -15,7 +15,18 @@ public enum ErrorCodeAndMessage {
     ALREADY_EXIST_USER_NICKNAME(HttpStatus.CONFLICT, "Already Exist User Nickname"),
     UNAUTHORIZED_TOKEN(HttpStatus.UNAUTHORIZED, "Full authentication is required to access this resource"),
 
+    //login
     LOGIN_FAILED(HttpStatus.NO_CONTENT, "Login Failed"),
+
+    //token
+    TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "Invalid JWT token"),
+    TOKEN_SIGNATURE_INVALID(HttpStatus.UNAUTHORIZED, "Invalid JWT signature"),
+    UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, "Unsupported JWT token"),
+    TOKEN_CLAIMS_EMPTY(HttpStatus.UNAUTHORIZED, "JWT claims string is empty"),
+
+    //oauth2
+    GOOGLE_OAUTH2_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "Google OAuth2 Access Token Invalid"),
+
     ;
 
 

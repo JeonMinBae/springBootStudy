@@ -1,23 +1,41 @@
-package com.hardy.study.auth.filter;
+package com.hardy.study.auth.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hardy.study.auth.PrincipalDetails;
 import com.hardy.study.auth.dto.SignInDto;
 import com.hardy.study.auth.jwt.JwtTokenProvider;
+import com.hardy.study.auth.oauth2.OAuth2TokenRequestDto;
+import com.hardy.study.auth.oauth2.OAuth2VerifyResponseDto;
+import com.hardy.study.auth.service.AuthService;
+import com.hardy.study.common.enums.ErrorCodeAndMessage;
+import com.hardy.study.common.enums.Role;
+import com.hardy.study.user.entity.UserEntity;
+import com.hardy.study.user.exception.CustomException;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,11 +56,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         System.out.println("request.getMethod(): " + request.getMethod());
 
+
         ObjectMapper om = new ObjectMapper();
+
         SignInDto signInDto = null;
-        try{
+        try {
             signInDto = om.readValue(request.getInputStream(), SignInDto.class);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -62,9 +82,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-        System.out.println("Authentication: "+principalDetails.getUsername());
+        System.out.println("Authentication: " + principalDetails.getUsername());
+
 
         return authentication;
+
     }
 
     @Override
@@ -77,21 +99,55 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
 
         System.out.println("authResult: " + authResult);
-        String jwtToken = jwtTokenProvider.generateToken(authResult);
-
-
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.addHeader(jwtTokenProvider.HEADER_STRING, jwtTokenProvider.TOKEN_PREFIX+jwtToken);
-
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("userId", principalDetails.getUser().getUserId());
-        responseBody.put("status", 200);
-        responseBody.put("access_token", jwtToken);
-
-        ObjectMapper om = new ObjectMapper();
-        om.writeValue(response.getOutputStream(), responseBody);
+//        String jwtToken = jwtTokenProvider.generateToken(authResult);
+//
+//
+//        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+//        response.setStatus(HttpServletResponse.SC_OK);
+//        response.addHeader(jwtTokenProvider.HEADER_STRING, jwtTokenProvider.TOKEN_PREFIX + jwtToken);
+//
+//        Map<String, Object> responseBody = new HashMap<>();
+//        responseBody.put("userId", principalDetails.getUser().getUserId());
+//        responseBody.put("status", 200);
+//        responseBody.put("access_token", jwtToken);
+//
+//        ObjectMapper om = new ObjectMapper();
+//        om.writeValue(response.getOutputStream(), responseBody);
 
 
     }
+
+    public static String getBody(HttpServletRequest request) throws IOException {
+
+        String body = null;
+        StringBuilder stringBuilder = new StringBuilder();
+        BufferedReader bufferedReader = null;
+
+        try {
+            InputStream inputStream = request.getInputStream();
+            if (inputStream != null) {
+                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                char[] charBuffer = new char[128];
+                int bytesRead = -1;
+                while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
+                    stringBuilder.append(charBuffer, 0, bytesRead);
+                }
+            }
+        } catch (IOException ex) {
+            throw ex;
+        } finally {
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (IOException ex) {
+                    throw ex;
+                }
+            }
+        }
+
+        body = stringBuilder.toString();
+        return body;
+    }
+
+
 }

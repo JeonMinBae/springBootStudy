@@ -8,7 +8,7 @@ server:
             force: true
 
 spring:
-#    devtools:
+    #    devtools:
 #        restart:
 #            enabled: true
     datasource:
@@ -34,6 +34,14 @@ spring:
         #콘솔 화면에 쿼리문 출력
         show-sql: true
         open-in-view: false
-
-
+    security:
+        oauth2:
+            client:
+                registration:
+                    google:
+                        client-id: 315991187398-usl0a6gtmvqrke2fdile5pb5rdtb4f26.apps.googleusercontent.com
+                        client-secret: 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
+                        scope:
+                        - email
+                        - profile
 

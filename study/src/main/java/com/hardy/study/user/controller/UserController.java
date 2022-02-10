@@ -8,6 +8,7 @@ import com.hardy.study.user.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +33,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/test")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_GUEST')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_ANONYMOUS')")
     public ResponseEntity<String> test(){
         return ResponseEntity.ok("hello");
     }
@@ -40,9 +41,11 @@ public class UserController {
 
     @PostMapping("")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<UserEntity> createUser(@Valid @RequestBody UserCreateDto userCreateDto) throws URISyntaxException {
+    public ResponseEntity<UserEntity> createUser(@Valid @RequestBody UserCreateDto userCreateDto,
+                                                 @AuthenticationPrincipal UserEntity currentUser)
+        throws URISyntaxException {
         UserEntity userEntity = userService.createUser(userCreateDto);
-        userEntity.setRegisterUserIdx(userEntity.getUserIdx());
+        userEntity.setRegisterUserIdx(currentUser.getUserIdx());
 
         URI uri = new URI("/users/" + userCreateDto.getUserId());
         return ResponseEntity.created(uri).body(userEntity);
@@ -50,7 +53,7 @@ public class UserController {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasRole('ROLE_GUEST')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_ANONYMOUS')")
     public ResponseEntity<List<UserEntity>> getUsers(){
         List<UserEntity> userEntity = userService.getUsers();
 
@@ -58,7 +61,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_GUEST')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<UserEntity> getUser(@PathVariable String userId){
         UserEntity userEntity = userService.getUserById(userId);
 

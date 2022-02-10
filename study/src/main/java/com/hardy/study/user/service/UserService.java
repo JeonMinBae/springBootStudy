@@ -28,6 +28,44 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional(readOnly = true)
+    public List<UserEntity> getUsers() {
+        return userRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public UserEntity getUserByIdx(String idx) {
+        UserEntity user = userRepository.findByUserIdx(idx)
+            .orElseThrow(() -> new CustomException(ErrorCodeAndMessage.USER_NOT_FOUNT));
+
+        return user;
+    }
+
+    @Transactional(readOnly = true)
+    public UserEntity getUserById(String id) {
+        UserEntity user = userRepository.findByUserId(id)
+            .orElseThrow(() -> new CustomException(ErrorCodeAndMessage.USER_NOT_FOUNT));
+
+        return user;
+    }
+
+    @Transactional(readOnly = true)
+    public UserEntity getOAuth2UserOrNull(String provider, String providerId) {
+        Optional<UserEntity> user = userRepository.findByProviderAndProviderId(provider, providerId);
+        if(user.isPresent()){
+            return user.get();
+        }
+
+        return null;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existOAuth2User(String provider, String providerId) {
+        return userRepository.existsByProviderAndProviderId(provider, providerId);
+    }
+
+
+
     @Transactional
     public UserEntity createUser(UserCreateDto userCreateDto) {
         if(userRepository.existsByUserId(userCreateDto.getUserId())) {
@@ -72,28 +110,6 @@ public class UserService {
 
 
         return userRepository.save(builder.build());
-    }
-
-    @Transactional(readOnly = true)
-    public List<UserEntity> getUsers() {
-        return userRepository.findAll();
-    }
-
-    @Transactional(readOnly = true)
-    public UserEntity getUserByIdx(String idx) {
-        UserEntity user = userRepository.findByUserIdx(idx)
-            .orElseThrow(() -> new CustomException(ErrorCodeAndMessage.USER_NOT_FOUNT));
-
-
-        return user;
-    }
-
-    @Transactional(readOnly = true)
-    public UserEntity getUserById(String id) {
-        UserEntity user = userRepository.findByUserId(id)
-            .orElseThrow(() -> new CustomException(ErrorCodeAndMessage.USER_NOT_FOUNT));
-
-        return user;
     }
 
     @Transactional
@@ -143,6 +159,8 @@ public class UserService {
             !userEntity.getUserAddressDetail().equals(userUpdateDto.getUserAddressDetail())) {
             userEntity.setUserAddressDetail(userUpdateDto.getUserAddressDetail());
         }
+
+        userRepository.save(userEntity);
 
     }
 

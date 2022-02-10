@@ -18,6 +18,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByUserNickName(String nickName);
 
+    Optional<UserEntity> findByProviderAndProviderId(String provider, String providerId);
+
     UserEntity save(UserEntity userEntity);
 
     void deleteByUserIdx(String idx);
@@ -27,6 +29,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Boolean existsByUserId(String id);
 
     Boolean existsByUserNickName(String nickName);
+
+    Boolean existsByProviderAndProviderId(String provider, String providerId);
 
 
 }

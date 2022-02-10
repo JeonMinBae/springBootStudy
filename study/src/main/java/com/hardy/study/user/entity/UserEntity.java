@@ -59,16 +59,13 @@ public class UserEntity extends BaseEntity {
     private String userEmail;
 
     //폰번호
-    @NotNull
     private String userPhoneNumber;
 
     //전화번호
     private String userTelephone;
 
-    @NotNull
     private String userAddress;
 
-    @NotNull
     private  String userZipcode;
 
     private  String userAddressDetail;
@@ -82,6 +79,12 @@ public class UserEntity extends BaseEntity {
     @NotBlank
     @Enumerated(EnumType.STRING)
     private Role userRole;
+
+
+    private String provider;
+
+    private String providerId;
+
 
 //    @Override
 //    public Collection<? extends GrantedAuthority> getAuthorities() {
